@@ -6,3 +6,5 @@
 *.obj
 *.exe
 *.res
+!win1x.res
+!win2x.res
