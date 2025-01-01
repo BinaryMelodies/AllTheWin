@@ -1,2 +1,8 @@
 
 *~
+/out
+*.o
+*.LOG
+*.obj
+*.exe
+*.res
