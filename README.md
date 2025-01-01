@@ -55,10 +55,13 @@ To compile everything, the following tools are required:
 * MinGW C compiler (if 64-bit support is desired)
 * [CeGCC compiler](https://cegcc.sourceforge.net) for Windows CE
 * Python interpreter
-* Microsoft Resource Compiler targetting Windows 1 and 2
+* Microsoft Resource Compiler targetting Windows 1 and 2 (`win1x.res` and `win2x.res` are provided in case the tool is unavailable)
 * Make and a UNIX terminal
 
 Before compiling, the paths to these compilers must be set up in Makefile.
+
+`genicon.py` can generate the icon files.
+Note that `win1.ico` is not in the modern icon file format and it will not appear correctly on modern systems.
 
 # Disclaimer
 
