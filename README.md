@@ -53,7 +53,7 @@ To compile everything, the following tools are required:
 
 * OpenWatcom C compiler (if 16-bit support is desired)
 * MinGW C compiler (if 64-bit support is desired)
-* [https://cegcc.sourceforge.net/](CeGCC compiler) for Windows CE
+* [CeGCC compiler](https://cegcc.sourceforge.net) for Windows CE
 * Python interpreter
 * Microsoft Resource Compiler targetting Windows 1 and 2
 * Make and a UNIX terminal
@@ -70,12 +70,12 @@ It is provided as an educational tool, as an example of what is possible among t
 To develop this project, the examples in early Microsoft Windows APIs have been consulted, as well as initialization files (crts) for open source compilers.
 Some URLs that proved helpful:
 
-* [https://learn.microsoft.com/en-us/windows/win32/gdi/drawing-with-the-mouse]
-* [https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings]
-* [https://learn.microsoft.com/en-us/windows/win32/sysinfo/targeting-your-application-at-windows-8-1]
-* [https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource]
-* [https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindowunicode]
-* [https://github.com/mingw-w64/mingw-w64/blob/master/mingw-w64-crt/crt/crtexewin.c]
-* [https://www.transmissionzero.co.uk/computing/win32-apps-with-mingw]
-* [https://zetcode.com/gui/winapi/controls]
+* https://learn.microsoft.com/en-us/windows/win32/gdi/drawing-with-the-mouse
+* https://learn.microsoft.com/en-us/windows/win32/learnwin32/working-with-strings
+* https://learn.microsoft.com/en-us/windows/win32/sysinfo/targeting-your-application-at-windows-8-1
+* https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
+* https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-iswindowunicode
+* https://github.com/mingw-w64/mingw-w64/blob/master/mingw-w64-crt/crt/crtexewin.c
+* https://www.transmissionzero.co.uk/computing/win32-apps-with-mingw
+* https://zetcode.com/gui/winapi/controls
 
