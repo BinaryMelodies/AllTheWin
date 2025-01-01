@@ -1,0 +1,180 @@
+
+#if VERSION_WIN3 || VERSION_WIN4 || VERSION_WIN5 || VERSION_WIN6 || TARGET_WINCE
+#include "windows.h"
+#else
+#include "version.h"
+#include "style.h"
+#endif
+
+#include "main.h"
+
+#define IDC_STATIC -1
+
+#if VERSION_WIN1 || VERSION_WIN2 || TARGET_WINCE
+/* For Windows 1.0, also as a degrading option from Windows 2.0 */
+IDR_MAINMENU1 MENU DISCARDABLE
+BEGIN
+	POPUP	"File"
+	BEGIN
+		MENUITEM	"New", ID_FILE_NEW
+		MENUITEM	"Open...", ID_FILE_OPEN
+		MENUITEM	"Save", ID_FILE_SAVE
+		MENUITEM	"Save As...", ID_FILE_SAVEAS
+		MENUITEM	SEPARATOR
+		MENUITEM	"Exit\tCtrl+Q", ID_FILE_EXIT
+		/* Windows 2.0 places it here */
+		MENUITEM	"About...\tF1", ID_HELP_ABOUT
+	END
+	POPUP	"Control"
+	BEGIN
+		MENUITEM	"Button", ID_CONTROL_BUTTON
+		MENUITEM	"Label", ID_CONTROL_LABEL
+		MENUITEM	"Image", ID_CONTROL_IMAGE, GRAYED
+		MENUITEM	"Check box", ID_CONTROL_CHECKBOX
+		MENUITEM	"Text edit", ID_CONTROL_TEXTEDIT
+	END
+	POPUP	"Help"
+	BEGIN
+		/* Windows 3.0 places it here */
+		MENUITEM	"About\tF1", ID_HELP_ABOUT
+	END
+END
+#endif
+
+#if !VERSION_WIN1 && !TARGET_WINCE
+/* For Windows 2.0 and later */
+IDR_MAINMENU MENU DISCARDABLE
+BEGIN
+	POPUP	"&File"
+	BEGIN
+		MENUITEM	"&New", ID_FILE_NEW
+		MENUITEM	"&Open...", ID_FILE_OPEN
+		MENUITEM	"&Save", ID_FILE_SAVE
+		MENUITEM	"Save &As...", ID_FILE_SAVEAS
+		MENUITEM	SEPARATOR
+		MENUITEM	"E&xit\tCtrl+Q", ID_FILE_EXIT
+		/* Windows 2.0 places it here */
+		MENUITEM	"A&bout...\tF1", ID_HELP_ABOUT
+	END
+	POPUP	"&Control"
+	BEGIN
+		MENUITEM	"&Button", ID_CONTROL_BUTTON
+		MENUITEM	"&Label", ID_CONTROL_LABEL
+		MENUITEM	"&Image", ID_CONTROL_IMAGE, GRAYED
+		MENUITEM	"C&heck box", ID_CONTROL_CHECKBOX
+		MENUITEM	"&Text edit", ID_CONTROL_TEXTEDIT
+	END
+	POPUP	"&Help"
+	BEGIN
+		/* Windows 3.0 places it here */
+		MENUITEM	"A&bout\tF1", ID_HELP_ABOUT
+	END
+END
+#endif
+
+#if VERSION_WIN1 || VERSION_WIN2
+IDD_ABOUTDIALOG DIALOG 22, 17, 160, 80
+STYLE WS_POPUP | WS_DLGFRAME
+BEGIN
+	CTEXT "16-bit", IDC_STATIC, 0, 5, 160, 8
+	ICON IDI_APPICON, IDC_STATIC, 9, 23, 0, 0
+	CTEXT "Sample Application", IDC_STATIC, 0, 14, 160, 8
+#if VERSION_WIN1
+	CTEXT "Version 1.00", IDC_STATIC, 30, 34, 94, 8
+#elif VERSION_WIN2
+	CTEXT "Version 2.00", IDC_STATIC, 30, 34, 94, 8
+#endif
+	CTEXT "Copyleft", IDC_STATIC, 0, 47, 160, 9
+	DEFPUSHBUTTON "OK" IDOK, 64, 59, 32, 14, WS_GROUP
+END
+#endif
+
+#if VERSION_WIN3 || VERSION_WIN4 || VERSION_WIN5 || VERSION_WIN6 || TARGET_WINCE
+#if !TARGET_WINCE
+IDD_ABOUTDIALOG DIALOG 22, 17, 160, 80
+#else
+IDD_ABOUTDIALOG DIALOG 0, 0, 120, 80
+#endif
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+#if !TARGET_WINCE
+FONT 8, "MS Sans Serif"
+#else
+FONT 8, "System"
+#endif
+BEGIN
+#if TARGET_WIN32 || TARGET_WINCE
+	CTEXT "32-bit", IDC_STATIC, 0, 5, 160, 8
+#elif TARGET_WIN64
+	CTEXT "64-bit", IDC_STATIC, 0, 5, 160, 8
+#else
+	CTEXT "16-bit", IDC_STATIC, 0, 5, 160, 8
+#endif
+	ICON IDI_APPICON, IDC_STATIC, 9, 23, 0, 0
+	CTEXT "Sample Application", IDC_STATIC, 0, 14, 160, 8
+#if VERSION_WIN3
+	CTEXT "Version 3.00", IDC_STATIC, 30, 34, 94, 8
+#elif VERSION_WIN4
+	CTEXT "Version 4.00", IDC_STATIC, 30, 34, 94, 8
+#elif VERSION_WIN5
+	CTEXT "Version 5.00", IDC_STATIC, 30, 34, 94, 8
+#elif VERSION_WIN6
+	CTEXT "Version 6.00", IDC_STATIC, 30, 34, 94, 8
+#elif TARGET_WINCE
+	CTEXT "PocketPC/Mobile/Phone", IDC_STATIC, 30, 34, 94, 8
+#endif
+	CTEXT "Copyleft", IDC_STATIC, 0, 47, 160, 9
+	DEFPUSHBUTTON "OK", IDOK, 64, 59, 32, 14, WS_GROUP
+END
+#endif
+
+#if VERSION_WIN3
+IDI_APPICON ICON "win3.ico"
+#elif VERSION_WIN4 || VERSION_WIN5 || VERSION_WIN6 || TARGET_WINCE
+IDI_APPICON ICON "win4.ico"
+#else
+IDI_APPICON ICON "win1.ico"
+#endif
+
+IDR_ACCELERATOR ACCELERATORS DISCARDABLE
+BEGIN
+	"^Q", ID_FILE_EXIT, NOINVERT
+	VK_F1, ID_HELP_ABOUT, VIRTKEY, NOINVERT
+END
+
+STRINGTABLE
+BEGIN
+#if VERSION_WIN1
+	/* Windows 1.x and 2.x apps share registered classes, so we must distinguish between them */
+	IDS_APP_CLASS_NAME, "AppClass"
+#else
+	IDS_APP_CLASS_NAME, "AppClass2"
+#endif
+
+	IDS_APP_TITLE, "Sample Application"
+END
+
+#if VERSION_WIN5 || VERSION_WIN6
+#define CREATEPROCESS_MANIFEST_RESOURCE_ID 1
+#define RT_MANIFEST 24
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "main.manifest"
+#endif
+
+#if VERSION_WIN3 || VERSION_WIN4 || VERSION_WIN5 || VERSION_WIN6 || TARGET_WINCE
+/* TODO: expand */
+3000 VERSIONINFO
+FILEVERSION 1, 0, 0, 0
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		/* Windows 1252 */
+		/*BLOCK "080904E4"*/
+		/* Unicode */
+		BLOCK "080904B0"
+		BEGIN
+			VALUE "CompanyName", "NoCompany"
+		END
+	END
+END
+#endif
+

@@ -1,0 +1,143 @@
+#! /usr/bin/python3
+
+import os
+import sys
+import struct
+
+def read32le(file):
+	return struct.unpack('<I', file.read(4))[0]
+
+def main():
+	if len(sys.argv) >= 2 and sys.argv[1] == '-fix':
+		system = None
+		ver = None
+		mark_memory = None
+		mark_font = None
+
+		i = 2
+		fix = False
+		while i < len(sys.argv):
+			if sys.argv[i] == '-os':
+				i += 1
+				if i >= len(sys.argv):
+					print("Missing parameter to flag -os", file = sys.stderr)
+					exit(1)
+				system = {'os2': 1, 'os/2': 1, 'win': 2, 'windows': 2, 'win16': 2}.get(sys.argv[i])
+				if system is None:
+					system = int(sys.argv[i])
+				if not 0 <= system < 256:
+					print(f"Illegal OS value {system}", file = sys.stderr)
+					exit(1)
+			elif sys.argv[i] == '-ver':
+				i += 1
+				if i >= len(sys.argv):
+					print("Missing parameter to flag -ver", file = sys.stderr)
+					exit(1)
+				ver = tuple(map(int, sys.argv[i].split('.')))
+				if len(ver) == 1:
+					ver = ver + (0,)
+				elif len(ver) > 2:
+					print(f"Too many values to unpack in {sys.argv[i]}", file = sys.stderr)
+					exit(1)
+				if not all(0 <= v < 256 for v in ver):
+					print(f"Illegal version value {'.'.join(map(str, ver))}", file = sys.stderr)
+					exit(1)
+			elif sys.argv[i] == '-mark':
+				i += 1
+				if i >= len(sys.argv):
+					print("Missing parameter to flag -mark", file = sys.stderr)
+					exit(1)
+				if sys.argv[i].upper() in {'MEM', 'MEMORY'}:
+					mark_memory = True
+				elif sys.argv[i].upper() in {'-MEM', '-MEMORY'}:
+					mark_memory = False
+				elif sys.argv[i].upper() in {'FONT'}:
+					mark_font = True
+				elif sys.argv[i].upper() in {'-FONT'}:
+					mark_font = False
+			elif sys.argv[i].startswith('-'):
+				print("Unknown flag", sys.argv[i], file = sys.stderr)
+				exit(1)
+			else:
+				break
+			i += 1
+
+		if system is None and ver is None and mark_memory is None and mark_font is None:
+			print("No version or mark information provided", file = sys.stderr)
+			exit()
+
+		if system not in {None, 0, 2} and ver is not None:
+			print(f"Warning: operating system does not support Windows-style versioning", file = sys.stderr)
+
+		if system not in {None, 0, 2} and not (mark_memory is None and mark_font is None):
+			print(f"Warning: operating system does not support marks", file = sys.stderr)
+
+		if mark_font and not mark_memory:
+			print(f"Warning: marking for font only works if also marked for memory", file = sys.stderr)
+
+		new_value = 0
+		if mark_memory:
+			new_value |= 4
+		if mark_font:
+			new_value |= 2
+
+		for arg in sys.argv[i:]:
+			with open(arg, 'r+b') as file:
+				file.seek(0x3C)
+				new_offset = read32le(file)
+				file.seek(new_offset)
+				if file.tell() != new_offset or file.read(2) != b'NE':
+					print(f"{arg}: not an NE executable", file = sys.stderr)
+					continue
+				file.seek(new_offset + 0x36)
+				old_system = file.read(1)[0]
+				if system is not None:
+					file.seek(new_offset + 0x36)
+					file.write(bytes([system]))
+				if ver is not None:
+					if system is None and old_system not in {0, 2}:
+						print(f"{arg}: Error: OS does not support versioning, set -os to override", file = sys.stderr)
+						continue
+					file.seek(new_offset + 0x3E)
+					file.write(bytes(ver[-1::-1]))
+				if not (mark_font is None and mark_memory is None):
+					file.seek(new_offset + 0x37)
+					old_value = file.read(1)[0]
+					if mark_memory is not None:
+						old_value &= ~4
+					if mark_font is not None:
+						old_value &= ~2
+					old_value |= new_value
+					if old_value & 2 and not old_value & 4:
+						print(f"{arg}: Warning: setting font only works if memory is also set", file = sys.stderr)
+					file.seek(-1, os.SEEK_CUR)
+					file.write(bytes([old_value | new_value]))
+	else:
+		for arg in sys.argv[1:]:
+			try:
+				with open(arg, 'rb') as file:
+					file.seek(0x3C)
+					new_offset = read32le(file)
+					file.seek(new_offset)
+					if file.tell() != new_offset or file.read(2) != b'NE':
+						print("Not an NE executable", file = sys.stderr)
+						continue
+					file.seek(new_offset + 0x36)
+					system = file.read(1)[0]
+					file.seek(new_offset + 0x3E)
+					version = tuple(file.read(2)[-1::-1])
+					file.seek(new_offset + 0x37)
+					flag_value = file.read(1)[0]
+					system_name = {1: "OS/2", 2: "Windows"}.get(system)
+					flags = []
+					if flag_value & 4:
+						flags.append("MEMORY")
+					if flag_value & 2:
+						flags.append("FONT")
+					print(f"{arg}: OS: {system}" + (f" ({system_name})" if system_name is not None else "") + f", version: {'.'.join(map(str, version))}" + (", flags: " + ' '.join(flags) if len(flags) > 0 else ""))
+			except Exception as e:
+				print("Failed:", e, file = sys.stderr)
+
+if __name__ == '__main__':
+	main()
+
